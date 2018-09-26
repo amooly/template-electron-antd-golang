@@ -1,0 +1,58 @@
+.searchBar {
+    margin: 0 20px 20px;
+}
+
+.tableContent {
+    min-height: 100px;
+    margin: 20px 15px;
+    padding: 10px 20px;
+    background: #f6f8fa;;
+    border: 1px dot-dash gainsboro;
+    border-radius: 5px;
+}
+
+.optionGroup {
+    border-bottom: 1px solid gainsboro;
+    height: 2.5em
+}
+
+.optionGroup .optionButton {
+    float: right;
+    font-size: 0.9em;
+    margin-right: 10px
+}
+
+.checkboxGroup {
+    margin: 25px 20px;
+    width: 100%;
+}
+
+.checkboxGroup .checkboxItem {
+    margin: 10px 0;
+}
+
+.ant-drawer-close-x {
+    background-color: #1890ff;
+    color: #fff;
+}
+
+.ant-drawer-close-x:hover {
+    background-color: gainsboro;
+}
+
+.cardGrid {
+    width: 25%;
+    text-align: center
+}
+
+.card {
+    margin: 10px 0 20px;
+}
+
+.card .cardGrid {
+    padding: 24px 0px;
+}
+
+.card .cardGrid:hover {
+    cursor: pointer;
+}
