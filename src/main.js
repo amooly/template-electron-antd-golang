@@ -1,11 +1,14 @@
 'use strict';
 
 const {app, Menu, BrowserWindow} = require('electron');
+const {spawn} = require('child_process');
 
 // Keep a global reference of the window object, in order to prevent javascript garbage collection.
 let mainWindow = null;
 // Global variable to control whether the app should delete the mainWindow
 let willQuitApp = false;
+// golang background application
+let golang = null;
 
 function createWindow() {
     // Create the browser window.
@@ -41,7 +44,7 @@ function createWindow() {
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
     // Open the DevTools.
-    if (process.env.ENV == 'dev') {
+    if (process.env.ENV === 'dev') {
         mainWindow.webContents.openDevTools();
     }
 
@@ -58,8 +61,33 @@ function createWindow() {
     });
 }
 
+function createSpawn() {
+    if (golang) {
+        return;
+    }
+
+    if (process.env.ENV === 'dev') {
+        golang = spawn('go', ['run', './src/biz/main.go']);
+    } else {
+        golang = spawn('./app/main')
+    }
+
+    golang.stdout.on('data', (data) => {
+        console.log(`输出：${data}`);
+    });
+
+    golang.stderr.on('data', (data) => {
+        console.log(`错误：${data}`);
+    });
+
+    golang.on('close', (code) => {
+        console.log(`子进程退出码：${code}`);
+    });
+}
+
 app.on('ready', function () {
     createWindow();
+    createSpawn();
 });
 
 app.on('activate', function () {
@@ -79,11 +107,14 @@ app.on('activate', function () {
 app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform != 'darwin') {
+    if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
 app.on('before-quit', () => {
-    willQuitApp = true
+    willQuitApp = true;
+    if (golang) {
+        golang.kill('SIGHUP');
+    }
 });

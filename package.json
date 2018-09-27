@@ -5,7 +5,7 @@
   "scripts": {
     "start": "webpack --watch",
     "test": "ENV=dev electron app",
-    "build": "electron-packager app <application name> --icon <icon path> --overwrite"
+    "build": "go build -o app/main src/biz/main.go && electron-packager app <application name> --icon <icon path> --overwrite"
   },
   "devDependencies": {
     "antd": "^3.0.1",
