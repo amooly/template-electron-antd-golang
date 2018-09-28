@@ -1,5 +1,5 @@
 {
-  "name": "application_name",
+  "name": "sql_generator",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "go build -o app/main src/biz/main.go && electron-packager app <application name> --icon <icon path> --overwrite"
   },
   "devDependencies": {
-    "antd": "^3.0.1",
+    "antd": "^3.9.3",
     "babel": "^6.23.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",

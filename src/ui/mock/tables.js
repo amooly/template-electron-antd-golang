@@ -65,7 +65,7 @@ export default {
             ins_accept_task: {
                 name: "ins_accept_task",
                 annotation: "核赔任务",
-                indexName: "task_biz_id"
+                field: "task_biz_id"
             }
         }
     },
