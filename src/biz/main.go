@@ -10,10 +10,36 @@ import (
 )
 
 const (
-	configDir  = "~/Library/com.amooly.SQL Generator"
+	configDir  = "~/Library/Application\\ Support/com.amooly.sql_generator"
 	configFile = "config.json"
 	configPath = configDir + "/" + configFile
 )
+
+// 初始化配置文件
+func init() {
+
+	exist, err := pathExist(configFile)
+	if err != nil {
+		panic("读取配置目录失败：" + err.Error())
+	}
+	if !exist {
+		err := os.Mkdir(configDir, os.ModePerm)
+		if err != nil {
+			panic("创建配置目录失败：" + err.Error())
+		}
+	}
+
+	exist, err = pathExist(configPath)
+	if err != nil {
+		log.Fatal("读取配置失败", err)
+	} else if !exist {
+		f, err := os.Create(configPath)
+		defer f.Close()
+		if err != nil {
+			log.Fatal("创建配置失败", err)
+		}
+	}
+}
 
 func main() {
 	r := mux.NewRouter()
@@ -43,26 +69,6 @@ func getSql(w http.ResponseWriter, r *http.Request) {
 }
 
 func readFile() (string, error) {
-	exist, err := pathExist(configDir)
-	if err != nil {
-		return "", err
-	}
-	if !exist {
-		os.Mkdir(configDir, os.ModePerm)
-		return "", nil
-	}
-
-	exist, err = pathExist(configPath)
-	if err != nil {
-		return "", nil
-	} else if !exist {
-		f, err := os.Create(configPath)
-		defer f.Close()
-		if err != nil {
-			return "", err
-		}
-	}
-
 	f, err := os.OpenFile(configPath, os.O_RDONLY, 0600)
 	defer f.Close()
 	if err != nil {
