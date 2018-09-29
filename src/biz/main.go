@@ -58,12 +58,15 @@ func main() {
 }
 
 func queryConfig(w http.ResponseWriter, r *http.Request) {
+	var result map[string]interface{}
 
-	content, err := readFile()
-	if err != nil {
-		log.Fatal("读取文件失败", err)
+	if content, err := readFile(); err != nil {
+		log.Println("读取文件失败", err)
+		result = buildFailResult("读取文件失败")
+	} else {
+		result = buildSuccessResult(content)
 	}
-	if err := json.NewEncoder(w).Encode(content); err != nil {
+	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
 }
@@ -76,17 +79,31 @@ func getSql(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func readFile() (string, error) {
+func buildSuccessResult(data []byte) map[string]interface{} {
+	result := make(map[string]interface{})
+	result["success"] = true
+	result["data"] = string(data)
+	return result
+}
+
+func buildFailResult(err string) map[string]interface{} {
+	result := make(map[string]interface{})
+	result["success"] = false
+	result["err"] = err
+	return result
+}
+
+func readFile() ([]byte, error) {
 	f, err := os.OpenFile(configPath, os.O_RDONLY, 0600)
 	defer f.Close()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	contentByte, err := ioutil.ReadAll(f)
 	if err != nil {
-		return "", nil
+		return nil, nil
 	}
-	return string(contentByte), nil
+	return contentByte, nil
 }
 
 func pathExist(path string) (bool, error) {
