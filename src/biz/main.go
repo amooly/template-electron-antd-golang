@@ -7,18 +7,26 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/user"
 )
 
 const (
-	configDir  = "~/Library/Application\\ Support/com.amooly.sql_generator"
 	configFile = "config.json"
-	configPath = configDir + "/" + configFile
 )
+
+var configDir = "/.sql_generator"
+var configPath string
 
 // 初始化配置文件
 func init() {
+	if userInfo, err := user.Current(); err != nil {
+		panic("获取用户信息失败：" + err.Error())
+	} else {
+		configDir = userInfo.HomeDir + configDir
+		configPath = configDir + "/" + configFile
+	}
 
-	exist, err := pathExist(configFile)
+	exist, err := pathExist(configDir)
 	if err != nil {
 		panic("读取配置目录失败：" + err.Error())
 	}
