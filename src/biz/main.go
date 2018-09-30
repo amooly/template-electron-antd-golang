@@ -58,69 +58,72 @@ func main() {
 }
 
 func queryConfig(w http.ResponseWriter, r *http.Request) {
-	var result map[string]interface{}
-
 	if content, err := readFile(); err != nil {
 		log.Println("读取文件失败", err)
-		result = buildFailResult("读取文件失败")
+		writeFailResult(w, "读取文件失败")
 	} else {
-		result = buildSuccessResult(content)
-	}
-
-	if resultByte, err := json.Marshal(result); err != nil {
-		panic("响应失败")
-	} else {
-		w.Write(resultByte)
+		writeSuccessResult(w, content)
 	}
 }
 
 func saveConfig(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		writeFailResult(w, "获取请求失败")
+		return
 	}
 	if len(body) == 0 {
-		panic("数据为空")
+		log.Println("length of body is 0")
+		writeFailResult(w, "配置数据为空")
+		return
 	}
 
 	var tabs map[string]interface{}
 	if err := json.Unmarshal(body, &tabs); err != nil {
-		panic(err)
-	}
-	log.Println("config:", tabs)
-
-	tabsByte, err := json.Marshal(tabs)
-	if err != nil {
-		panic(err)
+		log.Println(err)
+		writeFailResult(w, "配置解析失败")
+		return
 	}
 
-	if _, err := writeFile(tabsByte); err != nil {
-		panic("写入失败")
+	if tabsByte, err := json.Marshal(tabs); err != nil {
+		log.Println(err)
+		writeFailResult(w, "配置存储失败")
+		return
+	} else if _, err := writeFile(tabsByte); err != nil {
+		log.Println(err)
+		writeFailResult(w, "配置存储失败")
+		return
 	}
-	result := buildSuccessResult(nil)
-	if resultByte, err := json.Marshal(result); err != nil {
-		panic("响应失败")
-	} else {
-		w.Write(resultByte)
-	}
+	writeSuccessResult(w, nil)
 }
 
 func getSql(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func buildSuccessResult(data []byte) map[string]interface{} {
+func writeSuccessResult(w http.ResponseWriter, data []byte) {
 	result := make(map[string]interface{})
 	result["success"] = true
 	result["data"] = string(data)
-	return result
+
+	if resultByte, err := json.Marshal(result); err != nil {
+		panic("响应失败:" + err.Error())
+	} else {
+		w.Write(resultByte)
+	}
 }
 
-func buildFailResult(err string) map[string]interface{} {
+func writeFailResult(w http.ResponseWriter, err string) {
 	result := make(map[string]interface{})
 	result["success"] = false
 	result["err"] = err
-	return result
+
+	if resultByte, err := json.Marshal(result); err != nil {
+		panic("响应失败:" + err.Error())
+	} else {
+		w.Write(resultByte)
+	}
 }
 
 func readFile() ([]byte, error) {
