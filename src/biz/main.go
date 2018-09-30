@@ -66,13 +66,43 @@ func queryConfig(w http.ResponseWriter, r *http.Request) {
 	} else {
 		result = buildSuccessResult(content)
 	}
-	if err := json.NewEncoder(w).Encode(result); err != nil {
-		panic(err)
+
+	if resultByte, err := json.Marshal(result); err != nil {
+		panic("响应失败")
+	} else {
+		w.Write(resultByte)
 	}
 }
 
 func saveConfig(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+	if len(body) == 0 {
+		panic("数据为空")
+	}
 
+	var tabs map[string]interface{}
+	if err := json.Unmarshal(body, &tabs); err != nil {
+		panic(err)
+	}
+	log.Println("config:", tabs)
+
+	tabsByte, err := json.Marshal(tabs)
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err := writeFile(tabsByte); err != nil {
+		panic("写入失败")
+	}
+	result := buildSuccessResult(nil)
+	if resultByte, err := json.Marshal(result); err != nil {
+		panic("响应失败")
+	} else {
+		w.Write(resultByte)
+	}
 }
 
 func getSql(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +124,7 @@ func buildFailResult(err string) map[string]interface{} {
 }
 
 func readFile() ([]byte, error) {
-	f, err := os.OpenFile(configPath, os.O_RDONLY, 0600)
+	f, err := os.OpenFile(configPath, os.O_RDONLY, os.ModePerm)
 	defer f.Close()
 	if err != nil {
 		return nil, err
@@ -104,6 +134,15 @@ func readFile() ([]byte, error) {
 		return nil, nil
 	}
 	return contentByte, nil
+}
+
+func writeFile(content []byte) (int, error) {
+	f, err := os.OpenFile(configPath, os.O_WRONLY, os.ModePerm)
+	defer f.Close()
+	if err != nil {
+		return 0, err
+	}
+	return f.Write(content)
 }
 
 func pathExist(path string) (bool, error) {
