@@ -1,9 +1,10 @@
 import React from 'react';
-import {Button, Drawer, Tabs} from 'antd';
+import {Button, Drawer, message, Tabs} from 'antd';
 import SearchBar from './SearchBar';
 import TableList from './TableList';
-import config from '../mock/tables';
 import Preference from "./Preference";
+
+const axios = require('axios');
 
 const TabPane = Tabs.TabPane;
 
@@ -40,31 +41,20 @@ export default class MainTab extends React.Component {
     }
 
     componentDidMount = () => {
-        let tabPane = {};
-        Object.keys(config).forEach((key) => {
-            const table = config[key];
-            let content = (
-                <TabPane tab={table.name} key={key}>
-                    <SearchBar
-                        orderNo={this.state.orderNo}
-                        showDbIndex={this.state.showDbIndex}
-                        onChange={this.handleSearch}
-                        onSubmit={this.handleGenerateSql}/>
-                    <TableList
-                        table={table}
-                        onChange={this.handleCheckedTables}
-                        checkedTables={this.state.checkedTables}/>
-                </TabPane>
-            );
-            tabPane[key] = content;
-        });
-
-        /**
-         * 获取后端的配置信息
-         */
-        this.setState({
-            tabKey: 'claim_report_no'
-        })
+        axios.get('http://127.0.0.1:1507/Config', {})
+            .then((response) => {
+                console.log("recevie", response.data);
+                let model = response.data.data;
+                let config = JSON.parse((model));
+                this.setState({
+                    config: config,
+                    tabKey: Object.keys(config)[0]
+                })
+            })
+            .catch(function (error) {
+                message.error('获取配置异常，请重试启动');
+                console.log(error);
+            });
     };
 
     /**
@@ -106,6 +96,7 @@ export default class MainTab extends React.Component {
     };
 
     render() {
+        let config = this.state.config;
 
         const operations = (
             <Button style={{marginRight: '10px'}}
