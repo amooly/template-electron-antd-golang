@@ -86,8 +86,8 @@ function createSpawn() {
 }
 
 app.on('ready', function () {
-    createWindow();
     createSpawn();
+    createWindow();
 });
 
 app.on('activate', function () {

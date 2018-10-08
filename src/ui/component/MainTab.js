@@ -86,13 +86,25 @@ export default class MainTab extends React.Component {
         /**
          * 调用后端生成sql
          */
-        console.log("生成sql")
+        console.log("生成sql");
         const data = {
-            showDbIndex: this.state.orderNo,
+            showDbIndex: this.state.showDbIndex,
             orderNo: this.state.orderNo,
             tabKey: this.state.tabKey,
             checkedTables: this.state.checkedTables
         };
+
+        console.log("send data", data);
+        axios.post('http://127.0.0.1:1507/Sql', {data})
+            .then((response) => {
+                console.log("recevie", response);
+                let model = response.data.data;
+                console.log(model)
+            })
+            .catch(function (error) {
+                message.error('生成Sql异常，请重试启动');
+                console.log(error);
+            });
     };
 
     render() {
