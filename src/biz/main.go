@@ -99,7 +99,7 @@ func saveConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSql(w http.ResponseWriter, r *http.Request) {
-
+	writeSuccessResult(w, []byte("test"))
 }
 
 func writeSuccessResult(w http.ResponseWriter, data []byte) {

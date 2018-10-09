@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, Drawer, message, Tabs} from 'antd';
+import {Button, Drawer, message, Modal, Tabs} from 'antd';
 import SearchBar from './SearchBar';
 import TableList from './TableList';
 import Preference from "./Preference";
 
 const axios = require('axios');
+const {clipboard} = require('electron');
 
 const TabPane = Tabs.TabPane;
 
@@ -43,7 +44,6 @@ export default class MainTab extends React.Component {
     componentDidMount = () => {
         axios.get('http://127.0.0.1:1507/Config', {})
             .then((response) => {
-                console.log("recevie", response.data);
                 let model = response.data.data;
                 let config = JSON.parse((model));
                 this.setState({
@@ -97,9 +97,19 @@ export default class MainTab extends React.Component {
         console.log("send data", data);
         axios.post('http://127.0.0.1:1507/Sql', {data})
             .then((response) => {
-                console.log("recevie", response);
                 let model = response.data.data;
-                console.log(model)
+                Modal.info({
+                    title: '生成SQL成功',
+                    content: (
+                        <div>
+                            {model}
+                        </div>
+                    ),
+                    onOk() {
+                        clipboard.writeText(model)
+                    },
+                    okText: "拷贝",
+                });
             })
             .catch(function (error) {
                 message.error('生成Sql异常，请重试启动');
