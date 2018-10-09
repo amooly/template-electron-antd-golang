@@ -132,12 +132,15 @@ export default class MainTab extends React.Component {
 
         return (
             <div>
-                <Tabs tabBarExtraContent={operations} activeKey={this.state.tabKey}
-                      onChange={(activeKey) => {
-                          this.setState({
-                              tabKey: activeKey
-                          })
-                      }}>
+                <Tabs
+                    // 时间关系暂不开发配置管理相关界面
+                    // tabBarExtraContent={operations}
+                    activeKey={this.state.tabKey}
+                    onChange={(activeKey) => {
+                        this.setState({
+                            tabKey: activeKey
+                        })
+                    }}>
                     {
                         Object.keys(config).map((key) => {
                             const table = config[key];

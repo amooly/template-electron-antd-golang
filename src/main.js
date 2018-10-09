@@ -18,7 +18,7 @@ function createWindow() {
     mainWindow.loadURL('file://' + __dirname + '/index.html');
 
     var template = [{
-        label: "ELECTRON",
+        label: "SQL Generator",
         submenu: [
             {label: "About Application", selector: "orderFrontStandardAboutPanel:"},
             {type: "separator"},
