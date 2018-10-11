@@ -99,7 +99,35 @@ func saveConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSql(w http.ResponseWriter, r *http.Request) {
-	writeSuccessResult(w, []byte("test"))
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		writeFailResult(w, "获取请求失败")
+		return
+	}
+	if len(body) == 0 {
+		log.Println("length of body is 0")
+		writeFailResult(w, "配置数据为空")
+		return
+	}
+	var request SqlRequest
+	if err := json.Unmarshal(body, &request); err != nil {
+		log.Println("failed to unmarshal", err)
+		writeFailResult(w, "请求非法")
+		return
+	}
+
+	if len(request.CheckedTables) <= 0 {
+		writeFailResult(w, "未选中对应表")
+		return
+	}
+
+	if len(request.OrderNo) <= 0 {
+		writeFailResult(w, "请输入单据号")
+		return
+	}
+
+	writeSuccessResult(w, body)
 }
 
 func writeSuccessResult(w http.ResponseWriter, data []byte) {

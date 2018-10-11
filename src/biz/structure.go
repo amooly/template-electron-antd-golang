@@ -28,3 +28,11 @@ type Table struct {
 	Parser     Parser
 	Sql        string
 }
+
+// sql生成的请求对象
+type SqlRequest struct {
+	CheckedTables []string
+	OrderNo       string
+	ShowDbIndex   bool
+	TabKey        string
+}

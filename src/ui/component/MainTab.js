@@ -44,7 +44,13 @@ export default class MainTab extends React.Component {
     componentDidMount = () => {
         axios.get('http://127.0.0.1:1507/Config', {})
             .then((response) => {
-                let model = response.data.data;
+                response = response.data;
+                if (!response.success) {
+                    message.error(response.err);
+                    return
+                }
+
+                let model = response.data;
                 let config = JSON.parse((model));
                 this.setState({
                     config: config,
@@ -95,9 +101,21 @@ export default class MainTab extends React.Component {
         };
 
         console.log("send data", data);
-        axios.post('http://127.0.0.1:1507/Sql', {data})
+        axios.post(
+            'http://127.0.0.1:1507/Sql',
+            {
+                showDbIndex: this.state.showDbIndex,
+                orderNo: this.state.orderNo,
+                tabKey: this.state.tabKey,
+                checkedTables: this.state.checkedTables
+            })
             .then((response) => {
-                let model = response.data.data;
+                response = response.data;
+                if (!response.success) {
+                    message.error(response.err);
+                    return
+                }
+                let model = response.data;
                 Modal.info({
                     title: '生成SQL成功',
                     content: (
@@ -109,6 +127,7 @@ export default class MainTab extends React.Component {
                         clipboard.writeText(model)
                     },
                     okText: "拷贝",
+                    maskClosable: true,
                 });
             })
             .catch(function (error) {

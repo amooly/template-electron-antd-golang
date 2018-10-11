@@ -67,7 +67,7 @@ function createSpawn() {
     }
 
     if (process.env.ENV === 'dev') {
-        golang = spawn('go', ['run', './src/biz/main.go']);
+        golang = spawn('go', ['run', './src/biz/main.go', './src/biz/structure.go']);
     } else {
         golang = spawn('./app/main')
     }
@@ -87,7 +87,7 @@ function createSpawn() {
 
 app.on('ready', function () {
     createSpawn();
-    createWindow();
+    setTimeout(createWindow, 1000);
 });
 
 app.on('activate', function () {
